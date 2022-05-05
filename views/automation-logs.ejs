@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <%- include('./partials/head'); %>
+    <link href="/css/automation.css" rel="stylesheet" type="text/css">
+  </head>
+
+  <body>
+
+    <%- include('./partials/navbar'); %>
+
+    <div class="container-fluid">
+       <div id="appmixer-container">
+         <div id="my-logs"></div>
+      </div>
+    </div>
+
+    <%- include('./partials/scripts'); %>
+
+    <script src="https://my.qa.appmixer.com/appmixer/appmixer.js"></script>
+    <script src="/js/automation.js"></script>
+    <script>
+        showLogs();
+    </script>
+  </body>
+
+</html>

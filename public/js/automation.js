@@ -1,0 +1,176 @@
+const BASE_URL = 'https://api.qa.appmixer.com';
+
+const appmixer = new Appmixer({ baseUrl: BASE_URL });
+
+async function getUserProfile() {
+    const res = await fetch('/api/me');
+    return res.json();
+}
+
+async function ensureAppmixerVirtualUser() {
+
+    const userinfo = await getUserProfile();
+    const appmixerUserUsername = userinfo._id + '@appmixertodoapp.com';
+    const appmixerUserPassword = userinfo.apiKey;
+
+    let auth;
+    try {
+        auth = await appmixer.api.authenticateUser(appmixerUserUsername, appmixerUserPassword);
+        appmixer.set('accessToken', auth.token);
+    } catch (err) {
+        if (err.response && err.response.status === 403) {
+            // Virtual user not yet created in Appmixer. Create one with a random password and save the password in YOUR system
+            // so that you can authenticate the user later.
+            try {
+                auth = await appmixer.api.signupUser(appmixerUserUsername, appmixerUserPassword);
+                appmixer.set('accessToken', auth.token);
+                // Inject api key as an account to the Appmixer virtual user.
+                //await appmixer.api.getAccounts({ filter: 'service:slack' });
+            } catch (err) {
+                onerror(err);
+            }
+        } else {
+            onerror('Something went wrong.');
+        }
+    }
+}
+
+async function showFlows() {
+
+    await ensureAppmixerVirtualUser();
+
+    const flowManager = appmixer.ui.FlowManager({
+        el: '#my-flowmanager',
+        options: {
+            menu: [ { label: 'Delete', event: 'flow:remove' } ],
+            customFilter: {
+                sharedWith: []
+            }
+        }
+    });
+    /*
+    flowManager.state('query', {
+        shared: false
+    });
+    */
+    const designer = appmixer.ui.Designer({
+        el: '#my-designer',
+        options: {
+            showHeader: true,
+            showButtonHome: false,
+            showButtonInsights: false,
+            showButtonConnectors: false,
+            menu: [
+                { event: 'flow:rename', label: 'Rename' }
+            ]
+        }
+    });
+
+    // Note: flow:start, flow:stop is handled implicitely since we're not overriding the behaviour here.
+
+    flowManager.on('flow:create', async () => {
+        try {
+            flowManager.state('loader', true);
+            const flowId = await appmixer.api.createFlow('New flow');
+            flowManager.state('loader', false);
+            designer.set('flowId', flowId);
+            flowManager.close();
+            designer.open();
+        } catch (err) { onerror(err) }
+    });
+
+    flowManager.on('flow:open', (flowId) => {
+        designer.set('flowId', flowId);
+        flowManager.close();
+        designer.open();
+    });
+
+    flowManager.on('flow:remove', async (flowId) => {
+        try {
+            flowManager.state('loader', true);
+            await appmixer.api.deleteFlow(flowId);
+            flowManager.state('loader', false);
+            flowManager.reload();
+        } catch (err) { onerror(err) }
+    });
+
+    flowManager.open();
+}
+
+async function showIntegrations() {
+
+    await ensureAppmixerVirtualUser();
+
+    const integrations = appmixer.ui.Integrations({ el: '#my-integrations' });
+    const wizard = appmixer.ui.Wizard({ el: '#my-wizard' });
+
+    const btnCloseWizard = document.querySelector('.btn-close-wizard');
+    btnCloseWizard.addEventListener('click', async (evt) => {
+        if (btnCloseWizard.dataset.newFlowId) {
+            // If new configuration was not finished and the user closed the wizard, immediately remove the flow.
+            await appmixer.api.deleteFlow(btnCloseWizard.dataset.newFlowId);
+            integrations.reload();
+        }
+        closeWizard();
+    }, false)
+
+    const closeWizard = () => {
+        wizard.close();
+        var containerEl = document.querySelector('#my-wizard-container');
+        containerEl.style.display = 'none';
+        btnCloseWizard.dataset.newFlowId = '';
+    };
+
+    wizard.on('cancel', async () => {
+        if (btnCloseWizard.dataset.newFlowId) {
+            // If new configuration was not finished and the user closed the wizard, immediately
+            // remove the flow.
+            await appmixer.api.deleteFlow(btnCloseWizard.dataset.newFlowId);
+            integrations.reload();
+        }
+        closeWizard();
+    });
+    
+    wizard.on('flow:start', async (integrationId) => {
+        try {
+            await appmixer.api.startFlow(integrationId);
+            closeWizard(wizard);
+            integrations.reload();
+        } catch (err) {
+            onerror('Flow setup errors: ' + err);
+        }
+    });
+
+    integrations.on('integration:create', async (templateId) => {
+        const integrationId = await appmixer.api.cloneFlow(templateId, { connectAccounts: false });
+        await appmixer.api.updateFlow(integrationId, { templateId: templateId });
+        integrations.reload();
+        closeWizard();
+        btnCloseWizard.dataset.newFlowId = integrationId;
+        openWizard(wizard, integrationId, true);
+    });
+
+    integrations.on('integration:edit', (integrationId) => {
+        openWizard(wizard, integrationId);
+    });
+    integrations.open();
+}
+
+function openWizard(wizard, integrationId) {
+    wizard.set('flowId', integrationId);
+    wizard.open();
+    var containerEl = document.querySelector('#my-wizard-container');
+    containerEl.style.display = 'block';
+}
+
+async function showLogs() {
+
+    await ensureAppmixerVirtualUser();
+
+    const logs = appmixer.ui.InsightsLogs({ el: '#my-logs' });
+    logs.open();
+}
+
+function onerror(err) {
+    alert(err);
+}

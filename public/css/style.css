@@ -1,0 +1,22 @@
+.hov:hover {
+    background-color: rgb(201, 193, 209);
+}
+
+.basicstyle {
+    cursor: pointer;
+}
+
+.logo {
+    border-radius: 64px;
+    height: 38px;
+}
+.libasic {
+    display: flex;
+    justify-content: space-between;
+    font-family: sans-serif;
+    font-size:1.2rem;
+}
+
+.navbar {
+    border-bottom: 1px solid lightgray;
+}
