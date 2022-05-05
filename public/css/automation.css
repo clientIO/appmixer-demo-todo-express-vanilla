@@ -1,0 +1,50 @@
+#appmixer-container {
+    position: relative;
+    width: 100%;
+    height: 1000px;
+    border: 1px solid lightgray;
+    border-top: transparent;
+}
+
+
+#my-wizard-container {
+    display: none;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 1;
+}
+#my-wizard-wrapper {
+    margin: 130px auto;
+    width: 50%;
+    position: relative;
+    height: 100%;
+    border: 1px solid lightgray;
+}
+#my-wizard-bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white;
+    opacity: .99;
+}
+
+#my-wizard-wrapper .btn-close-wizard {
+    position: absolute;
+    z-index: 1;
+    right: -25px;
+    color: black;
+    font-size: 30px;
+    background: transparent;
+    border: none;
+    font-family: fantasy;
+    top: -40px;
+    cursor: pointer;
+    outline: none;
+}
+
+

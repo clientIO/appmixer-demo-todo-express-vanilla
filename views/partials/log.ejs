@@ -1,0 +1,30 @@
+<div class="container mt-5 ">
+  <form action="/api/todo" class="d-flex" method="POST">
+    <input type="text" name="todo" class="form-control" placeholder="Enter Todo">
+    <input type="submit" value="Add" class="btn btn-md btn-primary mx-3">
+  </form>
+
+  <ul class="list-group mt-5 ">
+    <% todos.forEach(todo => { %>
+
+    <li class="list-group-item hov libasic" 
+        <% if (todo.done == 1) 
+           { %>style=" background-color: #accec6 ; text-decoration: line-through;"
+        <% } %> >
+      <%= todo.todo %>
+
+      <span class="btn-todo-action">
+
+        <% if (todo.done == 0) 
+           { %> <a data-todo-id="<%=todo._id%>" class="btn btn-success btn-small btn-todo-done" style="margin-right:0px">Done</a>
+        <% } %>
+        
+        <a data-todo-id="<%=todo._id%>" class="btn btn-danger btn-small btn-todo-delete">Delete</a>
+      </span>
+    </li>
+
+    <% }) %>
+  </ul>
+
+</div>
+
