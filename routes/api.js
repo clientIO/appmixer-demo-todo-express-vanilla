@@ -4,13 +4,16 @@ const Webhook = require('../models/webhook');
 const { ensureAuth, ensureApiAuth } = require('../middleware/auth');
 const axios = require('axios');
 
-router.get('/me', ensureAuth, async (req, res) => {
+router.get('/me', ensureApiAuth, async (req, res) => {
     res.status(200).json(req.user);
 });
 
 router.post('/todo', ensureApiAuth, async (req,res) => {
     const { todo } = req.body;
     const { email } = req.user;
+
+    console.log('POST /todo', req.body, req.user);
+    
     if (!todo) {
         res.redirect('/');
     }
