@@ -47,4 +47,4 @@ app.use('/auth', require('./routes/auth'));
 app.use('/api', require('./routes/api'));
 
 
-app.listen(PORT,console.log(`listening at ${PORT}`));
+app.listen(PORT, console.log(`listening at ${PORT}`));
