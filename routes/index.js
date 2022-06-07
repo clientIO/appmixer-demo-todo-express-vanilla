@@ -28,10 +28,7 @@ router.get('/automation/integrations', ensureAuth, async (req, res) => {
 });
 
 router.get('/automation/actions', ensureAuth, async (req, res) => {
-    res.render('automation-actions', {
-        userinfo: req.user,
-        appmixerTemplateXlsxGdriveId: process.env.APPMIXER_TEMPLATE_XLSX_GDRIVE_ID
-    });
+    res.render('automation-actions', { userinfo: req.user, env: process.env });
 });
 
 module.exports = router;

@@ -174,9 +174,12 @@ async function showIntegrations() {
 
 async function initializeActions() {
 
-    await ensureAppmixerVirtualUser();
-
     const actionButtons = document.querySelectorAll('[data-appmixer-template-id]');
+
+    actionButtons.forEach(btn => btn.attributes.disabled = true);
+    await ensureAppmixerVirtualUser();
+    actionButtons.forEach(btn => btn.attributes.disabled = false);
+
     actionButtons.forEach(btn => btn.addEventListener('click', async (evt) => {
 
         evt.stopPropagation();
