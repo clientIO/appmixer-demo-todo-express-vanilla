@@ -38,7 +38,7 @@ router.put('/todo/:_id', ensureApiAuth, async (req, res) => {
     const { _id } = req.params;
     const updatedTodo = await Todo.findByIdAndUpdate(_id, { done: '1' }, { lean: true });
     const { email } = req.user;
-    notifyWebhooks(email, 'todo-updated', updatedTodo.todo);
+    notifyWebhooks(email, 'todo-updated', updatedTodo);
     res.status(200).json({});
 });
 
