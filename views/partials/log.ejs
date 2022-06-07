@@ -1,11 +1,9 @@
-<section class="vh-100" style="background-color: #eee;">
+<section style="background-color: #eee;">
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col col-lg-9 col-xl-7">
         <div class="card rounded-3">
           <div class="card-body p-4">
-
-            <h4 class="text-center my-3 pb-3">To Do App</h4>
 
             <form class="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-4 pb-2" action="/api/todo" method="POST">
               <div class="col-12">
@@ -17,6 +15,7 @@
 
               <div class="col-12">
                 <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-danger btn-todo-delete-all">Delete All</button>
               </div>
 
             </form>
