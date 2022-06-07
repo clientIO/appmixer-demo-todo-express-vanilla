@@ -20,3 +20,10 @@
 .navbar {
     border-bottom: 1px solid lightgray;
 }
+
+.todo-status-done {
+
+}
+.todo-status-done .todo-text {
+    text-decoration: line-through;
+}

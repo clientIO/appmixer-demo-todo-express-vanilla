@@ -97,70 +97,98 @@ async function showFlows() {
     flowManager.open();
 }
 
+let wizard;
+
+function openWizard(integrationId, deleteOnClose, onChange) {
+
+    const btnCloseWizard = document.querySelector('.btn-close-wizard');
+
+    if (!wizard) {
+        wizard = appmixer.ui.Wizard({ el: '#my-wizard' });
+
+        btnCloseWizard.addEventListener('click', async (evt) => {
+            if (btnCloseWizard.dataset.newFlowId) {
+                // If new configuration was not finished and the user closed the wizard, immediately remove the flow.
+                await appmixer.api.deleteFlow(btnCloseWizard.dataset.newFlowId);
+                onChange();
+            }
+            closeWizard(wizard, btnCloseWizard);
+        }, false)
+
+        wizard.on('cancel', async () => {
+            if (btnCloseWizard.dataset.newFlowId) {
+                // If new configuration was not finished and the user closed the wizard, immediately
+                // remove the flow.
+                await appmixer.api.deleteFlow(btnCloseWizard.dataset.newFlowId);
+                onChange();
+            }
+            closeWizard(wizard, btnCloseWizard);
+        });
+
+        wizard.on('flow:start', async (integrationId) => {
+            try {
+                await appmixer.api.startFlow(integrationId);
+                closeWizard(wizard, btnCloseWizard);
+                onChange();
+            } catch (err) {
+                onerror('Integration configuration errors: ' + err);
+            }
+        });
+    }
+
+    if (deleteOnClose) {
+        btnCloseWizard.dataset.newFlowId = integrationId;
+    }
+    wizard.set('flowId', integrationId);
+    wizard.open();
+    var containerEl = document.querySelector('#my-wizard-container');
+    containerEl.style.display = 'block';
+}
+
+function closeWizard(wizard, btnCloseWizard) {
+    wizard.close();
+    var containerEl = document.querySelector('#my-wizard-container');
+    containerEl.style.display = 'none';
+    btnCloseWizard.dataset.newFlowId = '';
+}
+
+
 async function showIntegrations() {
 
     await ensureAppmixerVirtualUser();
 
     const integrations = appmixer.ui.Integrations({ el: '#my-integrations' });
-    const wizard = appmixer.ui.Wizard({ el: '#my-wizard' });
-
-    const btnCloseWizard = document.querySelector('.btn-close-wizard');
-    btnCloseWizard.addEventListener('click', async (evt) => {
-        if (btnCloseWizard.dataset.newFlowId) {
-            // If new configuration was not finished and the user closed the wizard, immediately remove the flow.
-            await appmixer.api.deleteFlow(btnCloseWizard.dataset.newFlowId);
-            integrations.reload();
-        }
-        closeWizard();
-    }, false)
-
-    const closeWizard = () => {
-        wizard.close();
-        var containerEl = document.querySelector('#my-wizard-container');
-        containerEl.style.display = 'none';
-        btnCloseWizard.dataset.newFlowId = '';
-    };
-
-    wizard.on('cancel', async () => {
-        if (btnCloseWizard.dataset.newFlowId) {
-            // If new configuration was not finished and the user closed the wizard, immediately
-            // remove the flow.
-            await appmixer.api.deleteFlow(btnCloseWizard.dataset.newFlowId);
-            integrations.reload();
-        }
-        closeWizard();
-    });
-    
-    wizard.on('flow:start', async (integrationId) => {
-        try {
-            await appmixer.api.startFlow(integrationId);
-            closeWizard(wizard);
-            integrations.reload();
-        } catch (err) {
-            onerror('Flow setup errors: ' + err);
-        }
-    });
 
     integrations.on('integration:create', async (templateId) => {
         const integrationId = await appmixer.api.cloneFlow(templateId, { connectAccounts: false });
         await appmixer.api.updateFlow(integrationId, { templateId: templateId });
         integrations.reload();
-        closeWizard();
-        btnCloseWizard.dataset.newFlowId = integrationId;
-        openWizard(wizard, integrationId, true);
+        openWizard(integrationId, true, () => integrations.reload());
     });
 
     integrations.on('integration:edit', (integrationId) => {
-        openWizard(wizard, integrationId);
+        openWizard(integrationId, false, () => integrations.reload());
     });
     integrations.open();
 }
 
-function openWizard(wizard, integrationId) {
-    wizard.set('flowId', integrationId);
-    wizard.open();
-    var containerEl = document.querySelector('#my-wizard-container');
-    containerEl.style.display = 'block';
+async function initializeActions() {
+
+    await ensureAppmixerVirtualUser();
+
+    const actionButtons = document.querySelectorAll('[data-appmixer-template-id]');
+    actionButtons.forEach(btn => btn.addEventListener('click', async (evt) => {
+
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        const btn = evt.target;
+        const templateId = btn.dataset.appmixerTemplateId;
+
+        const actionId = await appmixer.api.cloneFlow(templateId, { connectAccounts: false });
+        await appmixer.api.updateFlow(actionId, { templateId: templateId });
+        openWizard(actionId, true, () => {});
+    }));
 }
 
 async function showLogs() {

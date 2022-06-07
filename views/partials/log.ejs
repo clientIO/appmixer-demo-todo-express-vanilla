@@ -1,30 +1,61 @@
-<div class="container mt-5 ">
-  <form action="/api/todo" class="d-flex" method="POST">
-    <input type="text" name="todo" class="form-control" placeholder="Enter Todo">
-    <input type="submit" value="Add" class="btn btn-md btn-primary mx-3">
-  </form>
+<section class="vh-100" style="background-color: #eee;">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col col-lg-9 col-xl-7">
+        <div class="card rounded-3">
+          <div class="card-body p-4">
 
-  <ul class="list-group mt-5 ">
-    <% todos.forEach(todo => { %>
+            <h4 class="text-center my-3 pb-3">To Do App</h4>
 
-    <li class="list-group-item hov libasic" 
-        <% if (todo.done == 1) 
-           { %>style=" background-color: #accec6 ; text-decoration: line-through;"
-        <% } %> >
-      <%= todo.todo %>
+            <form class="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-4 pb-2" action="/api/todo" method="POST">
+              <div class="col-12">
+                <div class="form-outline">
+                  <input name="todo" type="text" id="form1" class="form-control" />
+                  <label class="form-label" for="form1">Enter a task here</label>
+                </div>
+              </div>
 
-      <span class="btn-todo-action">
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary">Save</button>
+              </div>
 
-        <% if (todo.done == 0) 
-           { %> <a data-todo-id="<%=todo._id%>" class="btn btn-success btn-small btn-todo-done" style="margin-right:0px">Done</a>
-        <% } %>
-        
-        <a data-todo-id="<%=todo._id%>" class="btn btn-danger btn-small btn-todo-delete">Delete</a>
-      </span>
-    </li>
+            </form>
 
-    <% }) %>
-  </ul>
+            <table class="table mb-4">
+              <thead>
+                <tr>
+                  <th scope="col">No.</th>
+                  <th scope="col">Todo item</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
 
-</div>
+                <% todos.forEach((todo, index) => { %>
 
+                <tr class="<% if (todo.done == 1) { %> todo-status-done <% } %>">
+                  <th scope="row"><%= index %></th>
+                  <td class="todo-text"><%= todo.todo %></td>
+                  <td><% if (todo.done == 0) { %> In Progress <% } %></td>
+                  <td>
+                     <button data-todo-id="<%= todo._id %>" type="submit" class="btn btn-danger btn-todo-delete">Delete</button>
+
+                    <% if (todo.done == 0) { %>
+                       <button data-todo-id="<%= todo._id %>" type="submit" class="btn btn-success ms-1 btn-todo-done">Done</button>
+                    <% } else { %>
+                       <button data-todo-id="<%= todo._id %>" type="submit" class="btn btn-warning ms-1 btn-todo-undone">Undone</button>
+                    <% } %>
+                  </td>
+                </tr>
+
+               <% }) %>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
