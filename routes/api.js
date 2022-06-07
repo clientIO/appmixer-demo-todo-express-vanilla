@@ -26,7 +26,7 @@ router.post('/todo', ensureApiAuth, async (req,res) => {
 
 router.delete('/todo/:_id', ensureApiAuth, async (req, res) => {
     const { _id } = req.params;
-    const foundTodo = Todo.findOne({ _id }).lean();
+    const foundTodo = await Todo.findOne({ _id }).lean();
     if (!foundTodo) return res.status(200).json({});
     await Todo.deleteOne({ _id });
     const { email } = req.user;
