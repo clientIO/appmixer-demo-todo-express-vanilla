@@ -37,7 +37,8 @@ router.delete('/todo/:_id', ensureApiAuth, async (req, res) => {
 router.put('/todo/:_id', ensureApiAuth, async (req, res) => {
     const { _id } = req.params;
     const updatedTodo = await Todo.findByIdAndUpdate(_id, { done: '1' }, { lean: true });
-    notifyWebhooks(email, 'todo-deleted', updatedTodo.todo);
+    const { email } = req.user;
+    notifyWebhooks(email, 'todo-updated', updatedTodo.todo);
     res.status(200).json({});
 });
 
