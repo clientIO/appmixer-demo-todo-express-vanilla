@@ -51,8 +51,8 @@ router.post('/webhooks', ensureApiAuth, async (req, res) => {
     const { url } = req.body;
     const { email } = req.user;
     const newWebhook = new Webhook({ url, email });
-    await newWebhook.save();
-    res.status(200).json({});
+    const savedWebhook = await newWebhook.save();
+    res.status(200).json(savedWebhook);
 });
 
 router.delete('/webhooks/:_id', ensureApiAuth, async (req, res) => {
