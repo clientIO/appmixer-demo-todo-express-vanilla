@@ -31,6 +31,15 @@ router.delete('/todo/:_id', ensureApiAuth, async (req, res) => {
     res.status(200).json({});
 });
 
+router.delete('/todo', ensureApiAuth, async (req, res) => {
+    const { email } = req.user;
+    for await (const doc of Todo.find({ email }).cursor()) {
+        notifyWebhooks(email, 'todo-deleted', doc);
+        await Todo.deleteOne({ _id: doc._id });
+    }
+    res.status(200).json({});
+});
+
 router.put('/todo/:_id', ensureApiAuth, async (req, res) => {
     const { _id } = req.params;
     const { done } = req.body;
