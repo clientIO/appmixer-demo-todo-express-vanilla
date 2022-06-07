@@ -11,9 +11,6 @@ router.get('/me', ensureApiAuth, async (req, res) => {
 router.post('/todo', ensureApiAuth, async (req,res) => {
     const { todo } = req.body;
     const { email } = req.user;
-
-    console.log('POST /todo', req.body, req.user);
-    
     if (!todo) {
         res.redirect('/');
     }
@@ -36,7 +33,8 @@ router.delete('/todo/:_id', ensureApiAuth, async (req, res) => {
 
 router.put('/todo/:_id', ensureApiAuth, async (req, res) => {
     const { _id } = req.params;
-    const updatedTodo = await Todo.findByIdAndUpdate(_id, { done: '1' }, { lean: true });
+    const { done } = req.body;
+    const updatedTodo = await Todo.findByIdAndUpdate(_id, { done }, { lean: true });
     const { email } = req.user;
     notifyWebhooks(email, 'todo-updated', updatedTodo);
     res.status(200).json({});

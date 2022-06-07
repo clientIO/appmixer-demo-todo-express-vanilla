@@ -11,6 +11,10 @@ router.get('/log', ensureAuth, async (req, res) => {
     res.render('index', { todos: userTodos, userinfo: req.user });
 });
 
+router.get('/profile', ensureAuth, async (req, res) => {
+    res.render('profile', { userinfo: req.user });
+});
+
 router.get('/automation/flows', ensureAuth, async (req, res) => {
     res.render('automation-flows', { userinfo: req.user });
 });
@@ -21,6 +25,13 @@ router.get('/automation/logs', ensureAuth, async (req, res) => {
 
 router.get('/automation/integrations', ensureAuth, async (req, res) => {
     res.render('automation-integrations', { userinfo: req.user });
+});
+
+router.get('/automation/actions', ensureAuth, async (req, res) => {
+    res.render('automation-actions', {
+        userinfo: req.user,
+        appmixerTemplateXlsxGdriveId: process.env.APPMIXER_TEMPLATE_XLSX_GDRIVE_ID
+    });
 });
 
 module.exports = router;
