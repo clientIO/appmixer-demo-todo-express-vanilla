@@ -10,8 +10,9 @@ async function getUserProfile() {
 async function ensureAppmixerVirtualUser() {
 
     const userinfo = await getUserProfile();
+    const apiKey = userinfo.apiKey;
     const appmixerUserUsername = userinfo._id + '@appmixertodoapp.com';
-    const appmixerUserPassword = userinfo.apiKey;
+    const appmixerUserPassword = apiKey;
 
     let auth;
     try {
@@ -32,6 +33,34 @@ async function ensureAppmixerVirtualUser() {
         } else {
             onerror('Something went wrong.');
         }
+    }
+
+    await ensureAppmixerTodoAppServiceAccount(apiKey);
+}
+
+async function ensureAppmixerTodoAppServiceAccount(apiKey) {
+
+    // This function makes sure that the user has their own Todo App user account registered with Appmixer. This is useful so that
+    // the user does not have to authenticate to Todo App in Appmixer Integratins/Wizard again. This would not make sense since the
+    // user is already signed in and so we don't want to request their API key again in Appmixer Wizard. Instead, assuming
+    // we know the user API key here, we can automatically inject their account to Appmixer.
+    // See https://docs.appmixer.com/appmixer/tutorials/integration-templates#injecting-user-accounts for details.
+
+    const serviceAuth = await appmixer.api.getAuth('appmixer.tododemoapp');
+    const validAccount = serviceAuth.accounts && serviceAuth.accounts[Object.keys(serviceAuth.accounts)[0]].accessTokenValid === true;
+
+    if (!validAccount) {
+        await appmixer.api.createAccount(
+            // Setting requestProfileInfo to false makes Appmixer bypass requesting user profile from the TodoApp API.
+            // Instead, we provide the use profile info (profileInfo) directly.
+            { requestProfileInfo: false },
+            {
+                name: 'Your Account',
+                service: 'appmixer:tododemoapp',
+                token: { apiKey },
+                profileInfo: { id: 'TodoApp' }
+            }
+        );
     }
 }
 
