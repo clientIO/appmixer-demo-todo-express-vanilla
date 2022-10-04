@@ -2,6 +2,54 @@ const BASE_URL = 'https://api.qa.appmixer.com';
 
 const appmixer = new Appmixer({ baseUrl: BASE_URL });
 
+appmixer.set('theme', {
+    variables: {
+        font: {
+            //family: '\'SF Pro Text\', \'Helvetica Neue\', \'Helvetica\', \'Arial\', sans-serif',
+            family: 'Roboto,sans-serif',
+            familyMono: '\'SF Mono\', \'ui-monospace\', Menlo, monospace',
+            //weightRegular: 400,
+            weightRegular: 300,
+            //weightMedium: 500,
+            weightMedium: 400,
+            //weightSemibold: 600,
+            weightSemibold: 500,
+            size: 16
+        },
+        colors: {
+            base: '#FFFFFF',
+            //neutral: '#131314',
+            neutral: '#000000',
+            //focus: '#3688EB',
+            focus: '#1266f1',
+            error: '#DE3123',
+            warning: '#B56C09',
+            //success: '#09CD96',
+            success: '#00b74a',
+            modifier: '#C558CF',
+            highlighter: '#FFA500'
+        },
+        shadows: {
+            backdrop: 'rgba(0 0 0 / 6%)',
+            popover: '0 3px 9px rgba(0 0 0 / 12%)',
+            icon: '0 1px 3px rgb(0 0 0 / 6%)'
+        },
+        corners: {
+            //radiusSmall: '3px',
+            radiusSmall: '4px',
+            radiusMedium: '6px',
+            radiusLarge: '9px'
+        },
+        dividers: {
+            regular: '1px',
+            medium: '2px',
+            semibold: '3px',
+            bold: '6px',
+            extrabold: '9px'
+        }
+    }
+});
+
 async function getUserProfile() {
     const res = await fetch('/api/me');
     return res.json();
@@ -73,7 +121,8 @@ async function showFlows() {
         options: {
             menu: [ { label: 'Delete', event: 'flow:remove' } ],
             customFilter: {
-                sharedWith: []
+                userId: appmixer.get('user').id, // Show only my flows
+                wizard: '!'     // Filter out integration templates.
             }
         }
     });
@@ -186,7 +235,14 @@ async function showIntegrations() {
 
     await ensureAppmixerVirtualUser();
 
-    const integrations = appmixer.ui.Integrations({ el: '#my-integrations' });
+    const integrations = appmixer.ui.Integrations({
+        el: '#my-integrations',
+        options: {
+            customFilter: {
+                'sharedWith.0.domain': 'appmixertodoapp.com'
+            }
+        }
+    });
 
     integrations.on('integration:create', async (templateId) => {
         const integrationId = await appmixer.api.cloneFlow(templateId, { connectAccounts: false });
