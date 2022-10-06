@@ -13,9 +13,8 @@
             "schema": {
                 "type": "object",
                 "properties": {
-                    "item": {
-                        "type": "string"
-                    }
+                    "item": { "type": "string" },
+                    "status": { "type": "string" }
                 }
             },
             "inspector": {
@@ -25,6 +24,17 @@
                         "index": 0,
                         "label": "Todo",
                         "tooltip": "Your todo item."
+                    },
+                    "status": {
+                        "type": "select",
+                        "options": [
+                            { "content": "Todo", "value": "todo" },
+                            { "content": "Done", "value": "done" }
+                        ],
+                        "defaultValue": "todo",
+                        "index": 1,
+                        "label": "Status",
+                        "tooltip": "Select the status of the new todo item or leave as is to set the default 'todo' status."
                     }
                 }
             }
