@@ -1,10 +1,9 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { HeaderAPIKeyStrategy } = require('passport-headerapikey');
-const mongoose = require('mongoose');
-const User = require('../models/User');
+const User = require('../models/user');
 const crypto = require('crypto');
 
-module.exports = function (passport) {
+module.exports = (passport) => {
     passport.use(
         new GoogleStrategy(
             {
@@ -26,7 +25,7 @@ module.exports = function (passport) {
                             lastName: profile.name.familyName,
                             image: profile.photos[0].value,
                             email: profile.emails[0].value,
-                            apiKey: crypto.randomBytes(48).toString('hex')
+                            apiKey: crypto.randomBytes(48).toString('hex')      // Generate a random API key.
                         };
                         user = await User.create(newUser);
                         done(null, user);
@@ -41,8 +40,8 @@ module.exports = function (passport) {
     passport.use(new HeaderAPIKeyStrategy(
         { header: 'X-Api-Key' },
         false,
-        function(apiKey, done) {
-            User.findOne({ apiKey: apiKey }, function (err, user) {
+        (apiKey, done) => {
+            User.findOne({ apiKey: apiKey }, (err, user) => {
                 if (err) { return done(err); }
                 if (!user) { return done(null, false); }
                 return done(null, user);

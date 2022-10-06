@@ -12,19 +12,10 @@
 
     <div class="container-fluid">
       <br/>
-      <button data-appmixer-template-id="<%= env.APPMIXER_TEMPLATE_XLSX_GDRIVE_ID %>" class="btn btn-primary">Export To-Do list in MS-Excel file format to Google Drive</button>
+      <button disabled data-appmixer-template-id="<%= env.APPMIXER_TEMPLATE_XLSX_GDRIVE_ID %>" class="btn btn-primary">Export To-Do list in MS-Excel file format to Google Drive</button>
       <br/><br/>
-      <button data-appmixer-template-id="<%= env.APPMIXER_TEMPLATE_IMPORT_GOOGLE_SPREADSHEET_ID %>" class="btn btn-primary">Import Google Spreadsheet</button>
+      <button disabled data-appmixer-template-id="<%= env.APPMIXER_TEMPLATE_IMPORT_GOOGLE_SPREADSHEET_ID %>" class="btn btn-primary">Import Google Spreadsheet</button>
       <br/>
-       <div id="appmixer-container">
-         <div id="my-wizard-container">
-           <div id="my-wizard-bg"></div>
-           <div id="my-wizard-wrapper">
-             <button class="btn-close-wizard">x</button>
-             <div id="my-wizard"></div>
-           </div>
-         </div>
-      </div>
     </div>
 
     <%- include('./partials/scripts'); %>

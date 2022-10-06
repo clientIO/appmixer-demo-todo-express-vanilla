@@ -13,14 +13,14 @@
             "schema": {
                 "type": "object",
                 "properties": {
-                    "todo": {
+                    "item": {
                         "type": "string"
                     }
                 }
             },
             "inspector": {
                 "inputs": {
-                    "todo": {
+                    "item": {
                         "type": "text",
                         "index": 0,
                         "label": "Todo",
@@ -40,7 +40,7 @@
                 },
                 {
                     "label": "Todo",
-                    "value": "todo"
+                    "value": "item"
                 }
             ]
         }

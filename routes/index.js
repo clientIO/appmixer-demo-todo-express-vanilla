@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const Todo_model = require('../models/todo');
+const Todo = require('../models/todo');
 const { ensureAuth, ensureGuest } = require('../middleware/auth');
 
 router.get('/', ensureGuest, (req, res) => {
@@ -7,7 +7,7 @@ router.get('/', ensureGuest, (req, res) => {
 });
 
 router.get('/log', ensureAuth, async (req, res) => {
-    const userTodos = await Todo_model.find({ email: req.user.email });
+    const userTodos = await Todo.find({ userId: req.user._id });
     res.render('index', { todos: userTodos, userinfo: req.user });
 });
 

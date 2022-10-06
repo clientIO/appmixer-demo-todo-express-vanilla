@@ -2,29 +2,23 @@ const BASE_URL = 'https://api.qa.appmixer.com';
 
 const appmixer = new Appmixer({ baseUrl: BASE_URL });
 
+// See https://docs.appmixer.com/appmixer/customizing-ui/custom-theme.
 appmixer.set('theme', {
     variables: {
         font: {
-            //family: '\'SF Pro Text\', \'Helvetica Neue\', \'Helvetica\', \'Arial\', sans-serif',
             family: 'Roboto,sans-serif',
             familyMono: '\'SF Mono\', \'ui-monospace\', Menlo, monospace',
-            //weightRegular: 400,
             weightRegular: 300,
-            //weightMedium: 500,
             weightMedium: 400,
-            //weightSemibold: 600,
             weightSemibold: 500,
             size: 16
         },
         colors: {
             base: '#FFFFFF',
-            //neutral: '#131314',
             neutral: '#000000',
-            //focus: '#3688EB',
             focus: '#1266f1',
             error: '#DE3123',
             warning: '#B56C09',
-            //success: '#09CD96',
             success: '#00b74a',
             modifier: '#C558CF',
             highlighter: '#FFA500'
@@ -35,7 +29,6 @@ appmixer.set('theme', {
             icon: '0 1px 3px rgb(0 0 0 / 6%)'
         },
         corners: {
-            //radiusSmall: '3px',
             radiusSmall: '4px',
             radiusMedium: '6px',
             radiusLarge: '9px'
@@ -51,6 +44,7 @@ appmixer.set('theme', {
 });
 
 async function getUserProfile() {
+
     const res = await fetch('/api/me');
     return res.json();
 }
@@ -59,7 +53,12 @@ async function ensureAppmixerVirtualUser() {
 
     const userinfo = await getUserProfile();
     const apiKey = userinfo.apiKey;
+    // Appmixer username can be any, even non-existing, email address. We're using the user ID
+    // together with a fictional domain name. Appmixer does not send anything to these email addresses.
+    // They are just used as a virtual user credentials pair.
     const appmixerUserUsername = userinfo._id + '@appmixertodoapp.com';
+    // For simplicity, we just use the user API key as the Appmixer virtual user password. Alternatively,
+    // you can use any random string as the password.
     const appmixerUserPassword = apiKey;
 
     let auth;
@@ -68,13 +67,10 @@ async function ensureAppmixerVirtualUser() {
         appmixer.set('accessToken', auth.token);
     } catch (err) {
         if (err.response && err.response.status === 403) {
-            // Virtual user not yet created in Appmixer. Create one with a random password and save the password in YOUR system
-            // so that you can authenticate the user later.
+            // Virtual user not yet created in Appmixer. Create one.
             try {
                 auth = await appmixer.api.signupUser(appmixerUserUsername, appmixerUserPassword);
                 appmixer.set('accessToken', auth.token);
-                // Inject api key as an account to the Appmixer virtual user.
-                //await appmixer.api.getAccounts({ filter: 'service:slack' });
             } catch (err) {
                 onerror(err);
             }
@@ -89,18 +85,20 @@ async function ensureAppmixerVirtualUser() {
 async function ensureAppmixerTodoAppServiceAccount(apiKey) {
 
     // This function makes sure that the user has their own Todo App user account registered with Appmixer. This is useful so that
-    // the user does not have to authenticate to Todo App in Appmixer Integratins/Wizard again. This would not make sense since the
+    // the user does not have to authenticate to Todo App in Appmixer Integrations/Wizard again. This would not make sense since the
     // user is already signed in and so we don't want to request their API key again in Appmixer Wizard. Instead, assuming
     // we know the user API key here, we can automatically inject their account to Appmixer.
     // See https://docs.appmixer.com/appmixer/tutorials/integration-templates#injecting-user-accounts for details.
 
-    const serviceAuth = await appmixer.api.getAuth('appmixer.tododemoapp');
+    const APPMIXER_COMPONENTS_BUNDLE = 'appmixer.tododemoapp';
+    const serviceAuth = await appmixer.api.getAuth(APPMIXER_COMPONENTS_BUNDLE);
+    // Check if the user has a valid account (i.e. if we already injected their account in the past or not).
     const validAccount = serviceAuth.accounts && serviceAuth.accounts[Object.keys(serviceAuth.accounts)[0]].accessTokenValid === true;
 
     if (!validAccount) {
         await appmixer.api.createAccount(
             // Setting requestProfileInfo to false makes Appmixer bypass requesting user profile from the TodoApp API.
-            // Instead, we provide the use profile info (profileInfo) directly.
+            // Instead, we provide the user profile info (profileInfo) directly.
             { requestProfileInfo: false },
             {
                 name: 'Your Account',
@@ -112,6 +110,7 @@ async function ensureAppmixerTodoAppServiceAccount(apiKey) {
     }
 }
 
+// Page /automation/flows
 async function showFlows() {
 
     await ensureAppmixerVirtualUser();
@@ -121,16 +120,11 @@ async function showFlows() {
         options: {
             menu: [ { label: 'Delete', event: 'flow:remove' } ],
             customFilter: {
-                userId: appmixer.get('user').id, // Show only my flows
-                wizard: '!'     // Filter out integration templates.
+                userId: appmixer.get('user').id, // Show only my flows.
+                'wizard.fields': '!'     // Filter out integration templates (i.e. flows that have a Wizard defined).
             }
         }
     });
-    /*
-    flowManager.state('query', {
-        shared: false
-    });
-    */
     const designer = appmixer.ui.Designer({
         el: '#my-designer',
         options: {
@@ -140,11 +134,16 @@ async function showFlows() {
             showButtonConnectors: false,
             menu: [
                 { event: 'flow:rename', label: 'Rename' }
+            ],
+            toolbar: [
+                ['undo', 'redo'],
+                ['zoom-to-fit', 'zoom-in', 'zoom-out'],
+                ['logs']
             ]
         }
     });
 
-    // Note: flow:start, flow:stop is handled implicitely since we're not overriding the behaviour here.
+    // Note: flow:start, flow:stop, flow:remove is handled implicitely since we're not overriding the behaviour here.
 
     flowManager.on('flow:create', async () => {
         try {
@@ -163,74 +162,10 @@ async function showFlows() {
         designer.open();
     });
 
-    flowManager.on('flow:remove', async (flowId) => {
-        try {
-            flowManager.state('loader', true);
-            await appmixer.api.deleteFlow(flowId);
-            flowManager.state('loader', false);
-            flowManager.reload();
-        } catch (err) { onerror(err) }
-    });
-
     flowManager.open();
 }
 
-let wizard;
-
-function openWizard(integrationId, deleteOnClose, onChange) {
-
-    const btnCloseWizard = document.querySelector('.btn-close-wizard');
-
-    if (!wizard) {
-        wizard = appmixer.ui.Wizard({ el: '#my-wizard' });
-
-        btnCloseWizard.addEventListener('click', async (evt) => {
-            if (btnCloseWizard.dataset.newFlowId) {
-                // If new configuration was not finished and the user closed the wizard, immediately remove the flow.
-                await appmixer.api.deleteFlow(btnCloseWizard.dataset.newFlowId);
-                onChange();
-            }
-            closeWizard(wizard, btnCloseWizard);
-        }, false)
-
-        wizard.on('cancel', async () => {
-            if (btnCloseWizard.dataset.newFlowId) {
-                // If new configuration was not finished and the user closed the wizard, immediately
-                // remove the flow.
-                await appmixer.api.deleteFlow(btnCloseWizard.dataset.newFlowId);
-                onChange();
-            }
-            closeWizard(wizard, btnCloseWizard);
-        });
-
-        wizard.on('flow:start', async (integrationId) => {
-            try {
-                await appmixer.api.startFlow(integrationId);
-                closeWizard(wizard, btnCloseWizard);
-                onChange();
-            } catch (err) {
-                onerror('Integration configuration errors: ' + err);
-            }
-        });
-    }
-
-    if (deleteOnClose) {
-        btnCloseWizard.dataset.newFlowId = integrationId;
-    }
-    wizard.set('flowId', integrationId);
-    wizard.open();
-    var containerEl = document.querySelector('#my-wizard-container');
-    containerEl.style.display = 'block';
-}
-
-function closeWizard(wizard, btnCloseWizard) {
-    wizard.close();
-    var containerEl = document.querySelector('#my-wizard-container');
-    containerEl.style.display = 'none';
-    btnCloseWizard.dataset.newFlowId = '';
-}
-
-
+// Page /automation/integrations
 async function showIntegrations() {
 
     await ensureAppmixerVirtualUser();
@@ -244,49 +179,68 @@ async function showIntegrations() {
         }
     });
 
+    const wizard = appmixer.ui.Wizard();
+
+    wizard.on('flow:start', async (flowId) => {
+        wizard.state('loader', true);
+        appmixer.api.startFlow(flowId).then(() => {
+            wizard.state('loader', false);
+            wizard.close();
+            integrations.reload();
+        }).catch((error) => {
+            wizard.state('error', 'Starting flow failed.');
+        });
+    });
+
     integrations.on('integration:create', async (templateId) => {
-        const integrationId = await appmixer.api.cloneFlow(templateId, { connectAccounts: false });
-        await appmixer.api.updateFlow(integrationId, { templateId: templateId });
-        integrations.reload();
-        openWizard(integrationId, true, () => integrations.reload());
+        wizard.close();
+        wizard.set('flowId', templateId);
+        wizard.open();
     });
 
     integrations.on('integration:edit', (integrationId) => {
-        openWizard(integrationId, false, () => integrations.reload());
+        wizard.close();
+        wizard.set('flowId', integrationId);
+        wizard.open();
     });
     integrations.open();
 }
 
+// Page /automation/actions
 async function initializeActions() {
 
     const actionButtons = document.querySelectorAll('[data-appmixer-template-id]');
-
-    actionButtons.forEach(btn => btn.attributes.disabled = true);
+    // Disable action buttons until the virtual user is created to make sure the user can't click them before proper initialization.
+    actionButtons.forEach(btn => btn.disabled = true);
     await ensureAppmixerVirtualUser();
-    actionButtons.forEach(btn => btn.attributes.disabled = false);
+    actionButtons.forEach(btn => btn.disabled = false);
+
+    const wizard = appmixer.ui.Wizard();
 
     actionButtons.forEach(btn => btn.addEventListener('click', async (evt) => {
 
         evt.stopPropagation();
         evt.preventDefault();
 
-        const btn = evt.target;
-        const templateId = btn.dataset.appmixerTemplateId;
+        // Each button has a data-appmixer-template-id attribute that points to the integration template we want to run
+        // when the user clicks the action button.
+        const templateId = evt.target.dataset.appmixerTemplateId;
 
-        const actionId = await appmixer.api.cloneFlow(templateId, { connectAccounts: false });
-        await appmixer.api.updateFlow(actionId, { templateId: templateId });
-        openWizard(actionId, true, () => {});
+        wizard.close();
+        wizard.set('flowId', templateId);
+        wizard.open();
     }));
 }
 
+// Page /automation/logs
 async function showLogs() {
 
     await ensureAppmixerVirtualUser();
-
     const logs = appmixer.ui.InsightsLogs({ el: '#my-logs' });
     logs.open();
 }
 
 function onerror(err) {
+
     alert(err);
 }
