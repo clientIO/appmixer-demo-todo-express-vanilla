@@ -9,12 +9,12 @@ router.get('/me', ensureApiAuth, async (req, res) => {
 });
 
 router.post('/todo', ensureApiAuth, async (req,res) => {
-    const { item } = req.body;
+    const { item, status } = req.body;
     const userId = req.user._id;
     if (!item) {
         return res.status(400).json({ err: 'Todo item empty.' });
     }
-    const newTodoData = { item, userId, status: 'todo' };
+    const newTodoData = { item, userId, status: status || 'todo' };
     const newTodo = new Todo(newTodoData);
     const savedTodo = await newTodo.save();
     notifyWebhooks(userId, 'todo-created', savedTodo);
