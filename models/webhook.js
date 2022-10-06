@@ -1,12 +1,14 @@
 const mongoose = require('mongoose')
+const User = require('./user');
 
 const schema = new mongoose.Schema({
     url: {
         type: String,
         required: true
     },
-    email: {
-        type: String,
+    userId: {
+        type: mongoose.ObjectId,
+        ref: User,
         required: true
     },
     createdAt: {

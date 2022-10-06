@@ -18,15 +18,15 @@
                 },
                 {
                     "label": "Todo",
-                    "value": "todo"
+                    "value": "item"
                 },
                 {
                     "label": "Created At",
                     "value": "createdAt"
                 },
                 {
-                    "label": "Done",
-                    "value": "done"
+                    "label": "Status (todo/done)",
+                    "value": "status"
                 }
             ]
         }
