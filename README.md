@@ -1,32 +1,32 @@
 # appmixer-demo-todo-express-vanilla
 
-![App](assets/Todo demo app.png?raw=true "App")
+[Live demo](http://am-demo-todo-express-vanilla.herokuapp.com).
 
+![App](assets/todo-demo-app.png?raw=true "App")
 
-A demo app implemented in ExpressJS and Vanilla JS on FE showcasing Appmixer embedding. The app shows the 3 most common use cases for
-Appmixer embedding:
+A demo app implemented in ExpressJS and Vanilla JS on FE showcasing Appmixer embedding. The app shows the 3 most common use cases for Appmixer embedding:
 
 ## Integration templates
 
 Embed a marketplace of prebuilt integration templates. End user can select a template, fill in the last missing details and run an integration.
 
-![Integrations](assets/Todo demo app Integrations.png?raw=true "Integrations")
-![Wizard](assets/Todo demo app Wizard.png?raw=true "Wizard")
+![Integrations](assets/todo-demo-app-integrations.png?raw=true "Integrations")
+![Wizard](assets/todo-demo-app-wizard.png?raw=true "Wizard")
 
 
 ## Workflow automation
 
 Embed the full featured workflow designer UI allowing the end user to build custom workflow automations.
 
-![Workflow Designer](assets/Todo demo app Workflow Designer.png?raw=true "Workflow Designer")
-![Workflows](assets/Todo demo app Flows.png?raw=true "Flows")
+![Workflow Designer](assets/todo-demo-app-workflow-designer.png?raw=true "Workflow Designer")
+![Workflows](assets/todo-demo-app-flows.png?raw=true "Flows")
 
 ## Automation actions
 
 Add action buttons anywhere in your application to trigger showing Appmixer Wizard UI for the end user to fill in required fields and start a prebuilt automation.
 
-![Actions](assets/Todo demo app Actions.png?raw=true "Actions")
-![Action Wizard](assets/Todo demo app Action Wizard.png?raw=true "Action Wizard")
+![Actions](assets/todo-demo-app-actions.png?raw=true "Actions")
+![Action Wizard](assets/todo-demo-app-action-wizard.png?raw=true "Action Wizard")
 
 
 
@@ -57,12 +57,12 @@ MongoDB connection string.
 
 Google OAuth app credentials. Create an web app OAuth credentials in your Google Developer Console (https://console.developers.google.com/). The credentials are used to let users log in with their Google account in the demo app.
 
-![Google signin](assets/Todo demo app Google signin.png?raw=true "Google signin")
+![Google signin](assets/todo-demo-app-google-signin.png?raw=true "Google signin")
 
 Create a Google OAuth web client in your Google Developer console and use the Client ID and Client secret.
 
-![Google OAuth client](assets/Todo demo app Google Console OAuth client.png?raw=true "Google OAuth client")
-![Google OAuth setting](assets/Todo demo app Google Console OAuth setting.png?raw=true "Google OAuth setting")
+![Google OAuth client](assets/todo-demo-app-google-console-oauth-client.png?raw=true "Google OAuth client")
+![Google OAuth setting](assets/todo-demo-app-google-console-oauth-setting.png?raw=true "Google OAuth setting")
 
 
 
@@ -138,3 +138,7 @@ See [Appmixer CLI Documentation](https://docs.appmixer.com/appmixer/appmixer-cli
 $ appmixer pack appmixer-components
 $ appmixer publish appmixer.tododemoapp.zip
 ```
+
+#License
+
+This demo app is licensed under the [MIT License](https://opensource.org/licenses/MIT).
