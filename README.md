@@ -139,6 +139,6 @@ $ appmixer pack appmixer-components
 $ appmixer publish appmixer.tododemoapp.zip
 ```
 
-#License
+# License
 
 This demo app is licensed under the [MIT License](https://opensource.org/licenses/MIT).
