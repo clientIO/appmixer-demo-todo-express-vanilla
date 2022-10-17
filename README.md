@@ -28,7 +28,15 @@ Add action buttons anywhere in your application to trigger showing Appmixer Wiza
 ![Actions](assets/todo-demo-app-actions.png?raw=true "Actions")
 ![Action Wizard](assets/todo-demo-app-action-wizard.png?raw=true "Action Wizard")
 
+# How to navigate this repository
 
+* `app.js`: Application entry point.
+* `appmixer-components/`: Appmixer components working against the Todo demo app API (defined in `routes/api.js`). See [Appmixer Component Basic Structure](https://docs.appmixer.com/appmixer/component-definition/basic-structure) and [Example Component](https://docs.appmixer.com/appmixer/component-definition/example-component) for more details.
+* `middleware/`: Todo Demo app authentication middleware.
+* `models/`: Todo Demo app data models.
+* `public/`: Front-end JavaScript and Stylesheets. The `public/js/automation.js` is especially useful to see how the Appmixer SDK can be used to embed Appmixer in your apps.
+* `routes/`: The Todo demo application and API URL routes. The `routes/api.js` is defines the public api-key secured API of the Todo demo application.
+* `views/`: The HTML views for the Todo demo application implemented using [EJS](https://ejs.co/). See the `views/automation-*.ejs` files to see the HTML for pages where Appmixer UIs are embedded.
 
 # Deploy
 
