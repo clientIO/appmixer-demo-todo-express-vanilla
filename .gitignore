@@ -1,3 +1,4 @@
 node_modules/
 .env
 appmixer.tododemoapp.zip
+.DS_Store
