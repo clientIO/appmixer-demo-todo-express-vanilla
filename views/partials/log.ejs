@@ -1,0 +1,60 @@
+<section style="background-color: #eee;">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col col-lg-9 col-xl-7">
+        <div class="card rounded-3">
+          <div class="card-body p-4">
+
+            <form class="form-create-todo row row-cols-lg-auto g-3 justify-content-center align-items-center mb-4 pb-2" action="/api/todo" method="POST">
+              <div class="col-12">
+                <div class="form-outline">
+                  <input name="item" type="text" id="input-todo-text" class="form-control" tabindex="1" />
+                  <label class="form-label" for="input-todo-text">Enter a task here</label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-danger btn-todo-delete-all">Delete All</button>
+              </div>
+
+            </form>
+
+            <table class="table mb-4">
+              <thead>
+                <tr>
+                  <th scope="col">No.</th>
+                  <th scope="col">Todo item</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <% todos.forEach((todo, index) => { %>
+
+                <tr class="<% if (todo.status == 'done') { %> todo-status-done <% } %>">
+                  <th scope="row"><%= index %></th>
+                  <td class="todo-text"><%= todo.item %></td>
+                  <td><% if (todo.status == 'todo') { %> In Progress <% } %></td>
+                  <td>
+                     <button data-todo-id="<%= todo._id %>" type="submit" class="btn btn-danger btn-todo-delete">Delete</button>
+
+                    <% if (todo.status == 'todo') { %>
+                       <button data-todo-id="<%= todo._id %>" type="submit" class="btn btn-success ms-1 btn-todo-done">Done</button>
+                    <% } else { %>
+                       <button data-todo-id="<%= todo._id %>" type="submit" class="btn btn-warning ms-1 btn-todo-undone">Undone</button>
+                    <% } %>
+                  </td>
+                </tr>
+
+               <% }) %>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

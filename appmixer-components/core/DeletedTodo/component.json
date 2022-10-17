@@ -1,0 +1,35 @@
+{
+    "name": "appmixer.tododemoapp.core.DeletedTodo",
+    "author": "Appmixer <info@appmixer.com>",
+    "icon": "data:image/png;base64,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",
+    "private": false,
+    "quota": {},
+    "webhook": true,
+    "auth": {
+        "service": "appmixer:tododemoapp"
+    },
+    "outPorts": [
+        {
+            "name": "out",
+            "options": [
+                {
+                    "label": "Todo ID",
+                    "value": "_id"
+                },
+                {
+                    "label": "Todo",
+                    "value": "item"
+                },
+                {
+                    "label": "Created At",
+                    "value": "createdAt"
+                },
+                {
+                    "label": "Status (todo/done)",
+                    "value": "status"
+                }
+            ]
+        }
+    ],
+    "properties": {}
+}
